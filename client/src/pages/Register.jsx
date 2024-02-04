@@ -1,5 +1,7 @@
 import { useRecoilState } from "recoil"
 import { registerInformationState } from "../recoil/Auth"
+import { useMutation } from 'react-query';
+import axios from 'axios';
 import styled from "styled-components";
 
 const RegisterContainer = styled.div`
@@ -42,6 +44,15 @@ const Register = () => {
 
   const [registerInfo, setRegisterInfo] = useRecoilState(registerInformationState);
 
+  const registerMutation = useMutation((user) => 
+    axios.post('http://localhost:4040/api/users/register', user),{
+      mutationKey: 'register',
+      onSuccess: (e) => {console.log(e.data)},
+      onError: (error) => {console.error('Error creating todo:', error);},
+      onSettled: () => {},
+    }
+  );
+
   const handleOnChange = (e) => {
     setRegisterInfo(prev => ({
       ...prev,
@@ -50,7 +61,7 @@ const Register = () => {
   }
 
   const handleOnSubmit = () => {
-    console.log(registerInfo)
+    registerMutation.mutate(registerInfo);
   }
 
   return (

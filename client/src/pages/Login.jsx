@@ -46,9 +46,9 @@ const Login = () => {
   const [user, setUser] = useRecoilState(userInformationState);
 
   const loginMutation = useMutation((user) => 
-    axios.post('/api/users/login', user),{
+    axios.post('http://localhost:4040/api/users/login', user),{
         mutationKey: 'login',
-        onSuccess: () => {console.log('Todo created successfully');},
+        onSuccess: (e) => {console.log(e.data)},
         onError: (error) => {console.error('Error creating todo:', error);},
         onSettled: () => {},
       }
