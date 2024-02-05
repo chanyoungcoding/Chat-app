@@ -41,14 +41,16 @@ const LoginButton = styled.div`
 `
 
 const Login = () => {
-
-
+  
   const [user, setUser] = useRecoilState(userInformationState);
 
   const loginMutation = useMutation((user) => 
     axios.post('http://localhost:4040/api/users/login', user),{
         mutationKey: 'login',
-        onSuccess: (e) => {console.log(e.data)},
+        onSuccess: (e) => {
+          localStorage.setItem("user", JSON.stringify(e.data));
+          window.location.href = '/';
+        },
         onError: (error) => {console.error('Error creating todo:', error);},
         onSettled: () => {},
       }
