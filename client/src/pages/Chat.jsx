@@ -2,6 +2,7 @@ import axios from "axios"
 import { useQuery } from "react-query"
 import { useRecoilValue } from "recoil"
 import { userData } from "../recoil/Auth"
+import UserChat from "../components/UserChat"
 
 const Chat = () => {
 
@@ -17,14 +18,18 @@ const Chat = () => {
     queryFn: findChat
   })
 
-  console.log(data)
-
   if(isLodaing) return <p>Loding...</p>
 
   if(error) return <p>Something is wrong..</p>
 
   return (
-    <div>Chat</div>
+    <div>
+      {data?.map((item,index) => (
+        <div key={index}>
+          <UserChat member={item.members}/>
+        </div>
+      ))}
+    </div>
   )
 }
 
