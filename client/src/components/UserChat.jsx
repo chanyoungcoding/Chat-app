@@ -5,12 +5,8 @@ import styled from "styled-components";
 
 import UserProfileImg from "../assets/profile.svg";
 
-const UserChatContainer = styled.div`
-  display: flex;
-`
-
 const UserChatBox = styled.div`
-  width: 30%;
+  width: 100%;
   display: flex;
   align-items: center;
   border-bottom: 2px solid gray;
@@ -19,11 +15,6 @@ const UserChatBox = styled.div`
     height: 50px;
     object-fit: cover;
   }
-`
-
-const UserChattingBox = styled.div`
-  width: 70%;
-  background-color: gray;
 `
 
 const UserChatInformationBox = styled.div`
@@ -67,7 +58,7 @@ const UserChat = ({ member, onClick }) => {
   if (error) return <p>Something is wrong..</p>
 
   return (
-    <UserChatContainer>
+    <div>
       <UserChatBox onClick={onClick}>
         <img src={UserProfileImg} alt="#" />
         <UserChatInformationBox >
@@ -81,11 +72,7 @@ const UserChat = ({ member, onClick }) => {
           </div>
         </UserChatInformationBox>
       </UserChatBox>
-
-      <UserChattingBox>
-
-      </UserChattingBox>
-    </UserChatContainer>
+    </div>
   )
 }
 
