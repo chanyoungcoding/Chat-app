@@ -28,10 +28,7 @@ const ChattingBox = ({ text, createdAt, senderId }) => {
 
   const userId = useRecoilValue(userData)[0]?._id;
   const boxColor = userId === senderId ? userId : null;
-
-  console.log(text)
-  console.log(createdAt)
-  console.log(senderId)
+  
   return (
     <ChattingContainer color={boxColor}>
       <div>

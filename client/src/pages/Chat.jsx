@@ -1,5 +1,5 @@
 import axios from "axios"
-import { useQuery } from "react-query"
+import { useMutation, useQuery } from "react-query"
 import { useRecoilValue } from "recoil"
 import { useState } from "react"
 import styled from "styled-components"
@@ -45,6 +45,7 @@ const ChatBox = styled.div`
 const Chat = () => {
 
   const [chatBoxData, setChatBoxData] = useState([])
+  const [chatIdBox, setChatIdBox] = useState("");
   const [text, setText] = useState("");
 
   const userId = useRecoilValue(userData)[0]?._id
@@ -59,7 +60,10 @@ const Chat = () => {
     queryFn: findChat
   })
 
+  console.log(chatBoxData)
+
   const handleOnClick = (chatId) => {
+    setChatIdBox(chatId)
     const findChatBox = async() => {
       const response = await axios.get(`http://localhost:4040/api/messages/${chatId}`);
       return setChatBoxData(response.data);
@@ -67,7 +71,25 @@ const Chat = () => {
     findChatBox();
   }
 
+  const createMessageMutation = useMutation((newMessage) => 
+  axios.post('http://localhost:4040/api/messages', newMessage),{
+    mutationKey: 'createMessage',
+    onSuccess: () => {
+      // 새로운 메시지가 성공적으로 생성되면 해당 대화의 채팅 데이터를 다시 가져옴
+      const findChatBox = async () => {
+        const response = await axios.get(`http://localhost:4040/api/messages/${chatIdBox}`);
+        setChatBoxData(response.data);
+      };
+      findChatBox();
+    },
+    onError: (error) => {console.error('Error creating todo:', error);},
+    onSettled: () => {},
+  }
+);
+
   const handleOnSubmit = () => {
+    const data = {chatId: chatIdBox, senderId: userId, text: text}
+    createMessageMutation.mutate(data);
   }
 
   if(isLodaing) return <p>Loding...</p>
@@ -93,7 +115,6 @@ const Chat = () => {
             <ChattingBox text={item.text} createdAt={item.createdAt} senderId={item.senderId}/>
           </div>
         )) : ""}
-        {/* {chatBoxData ? chatBoxData?[0]} */}
           <div className="chat_input">
             <InputEmoji
               value={text}
