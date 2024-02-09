@@ -48,33 +48,29 @@ const UserChatInformationBox = styled.div`
       border-radius: 100%;
     }
   }
+  /* 추가: 클릭 가능하도록 설정 */
+  cursor: pointer;
 `
 
-const UserChat = ({member}) => {
-
-  const userId = JSON.parse(localStorage.getItem("user"))._id 
-  const otherUser = member.find(id => id !== userId);
-
-  const findOtherUser = async() => {
-    const response = await axios.get(`http://localhost:4040/api/users/find/${otherUser}`);
+const UserChat = ({ member, onClick }) => {
+  const findOtherUser = async () => {
+    const response = await axios.get(`http://localhost:4040/api/users/find/${member}`);
     return response.data;
   }
 
-  const { data, error, isLodaing} = useQuery({
-    queryKey: ['findOtherUser'],
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['findOtherUser', member],
     queryFn: findOtherUser
   })
 
-  if(isLodaing) return <p>Loding...</p>
-
-  if(error) return <p>Something is wrong..</p>
+  if (isLoading) return <p>Loading...</p>
+  if (error) return <p>Something is wrong..</p>
 
   return (
     <UserChatContainer>
-
-      <UserChatBox>
+      <UserChatBox onClick={onClick}>
         <img src={UserProfileImg} alt="#" />
-        <UserChatInformationBox>
+        <UserChatInformationBox >
           <div>
             <h1>{data?.name}</h1>
             <h2>12/12/2020</h2>
@@ -87,15 +83,15 @@ const UserChat = ({member}) => {
       </UserChatBox>
 
       <UserChattingBox>
-        ChatBox
-      </UserChattingBox>
 
+      </UserChattingBox>
     </UserChatContainer>
   )
 }
 
 UserChat.propTypes = {
-  member: PropTypes.array.isRequired,
+  member: PropTypes.string.isRequired,
+  onClick: PropTypes.func.isRequired
 };
 
-export default UserChat
+export default UserChat;
