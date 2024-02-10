@@ -44,6 +44,7 @@ const UserChatInformationBox = styled.div`
 `
 
 const UserChat = ({ member, onClick }) => {
+
   const findOtherUser = async () => {
     const response = await axios.get(`http://localhost:4040/api/users/find/${member}`);
     return response.data;
@@ -78,7 +79,7 @@ const UserChat = ({ member, onClick }) => {
 
 UserChat.propTypes = {
   member: PropTypes.string.isRequired,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
 };
 
 export default UserChat;

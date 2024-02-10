@@ -1,7 +1,7 @@
 {
-  "name": "chat-app",
+  "name": "socket",
   "version": "1.0.0",
-  "description": "chat app site",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,8 +10,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.6.7",
-    "react-query": "^3.39.3"
-  },
-  "devDependencies": {}
+    "socket.io": "^4.7.4"
+  }
 }

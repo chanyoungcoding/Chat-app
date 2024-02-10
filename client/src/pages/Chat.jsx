@@ -4,6 +4,8 @@ import { useRecoilValue } from "recoil"
 import { useState } from "react"
 import styled from "styled-components"
 import InputEmoji from "react-input-emoji";
+// import { io } from "socket.io-client";
+// import { useEffect } from "react"
 
 import { FaLocationArrow } from "react-icons/fa6";
 
@@ -43,25 +45,46 @@ const ChatBox = styled.div`
 
 
 const Chat = () => {
+  
+  const userId = useRecoilValue(userData)[0]?._id
 
   const [chatBoxData, setChatBoxData] = useState([])
   const [chatIdBox, setChatIdBox] = useState("");
   const [text, setText] = useState("");
 
-  const userId = useRecoilValue(userData)[0]?._id
+  // //socket
+  // const [socket, setSocket] = useState(null);
+  // const [onlineUsers, setOnlineUsers] = useState([]);
+
+  // console.log("onlineUsers", onlineUsers);
+  
+  // useEffect(() => {
+  //   const newSocket = io("http://localhost:3000");
+  //   setSocket(newSocket);
+
+  //   return () => {
+  //     newSocket.disconnect();
+  //   }
+  // },[userId])
+
+  // useEffect(() => {
+  //   if(socket === null) return
+  //   socket.emit("addNewUser", userId)
+  //   socket.on("getOnlineUsers", (res) => {
+  //     setOnlineUsers(res)
+  //   })
+  // }, [userId,socket])
 
   const findChat = async() => {
     const response = await axios.get(`http://localhost:4040/api/chats/${userId}`);
     return response.data;
   }
-
+  
   const { data, error, isLodaing} = useQuery({
     queryKey: ['findChat'],
     queryFn: findChat
   })
-
-  console.log(chatBoxData)
-
+  
   const handleOnClick = (chatId) => {
     setChatIdBox(chatId)
     const findChatBox = async() => {
@@ -70,7 +93,7 @@ const Chat = () => {
     }
     findChatBox();
   }
-
+  
   const createMessageMutation = useMutation((newMessage) => 
   axios.post('http://localhost:4040/api/messages', newMessage),{
     mutationKey: 'createMessage',
@@ -85,7 +108,7 @@ const Chat = () => {
     onError: (error) => {console.error('Error creating todo:', error);},
     onSettled: () => {},
   }
-);
+  );
 
   const handleOnSubmit = () => {
     const data = {chatId: chatIdBox, senderId: userId, text: text}
