@@ -24,7 +24,7 @@ const ChattingContainer = styled.div`
   
 `
 
-const ChattingBox = ({ text, createdAt, senderId }) => {
+const ChattingBox = ({ text, createdAt = '날짜오류', senderId }) => {
 
   const userId = useRecoilValue(userData)[0]?._id;
   const boxColor = userId === senderId ? userId : null;

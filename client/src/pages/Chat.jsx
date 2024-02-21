@@ -4,8 +4,7 @@ import { useRecoilValue } from "recoil"
 import { useState } from "react"
 import styled from "styled-components"
 import InputEmoji from "react-input-emoji";
-// import { io } from "socket.io-client";
-// import { useEffect } from "react"
+import socketIOClient from "socket.io-client";
 
 import { FaLocationArrow } from "react-icons/fa6";
 
@@ -13,6 +12,7 @@ import { userData } from "../recoil/Auth"
 import ChattingBox from "../components/ChattingBox"
 import OtherUser from "../components/OtherUser"
 import UserChat from "../components/UserChat"
+import { useEffect } from "react"
 
 const ChatContainer = styled.div`
   display: flex;
@@ -47,33 +47,14 @@ const ChatBox = styled.div`
 const Chat = () => {
   
   const userId = useRecoilValue(userData)[0]?._id
+  const socket = socketIOClient('localhost:4040');
+  console.log(socket)
 
   const [chatBoxData, setChatBoxData] = useState([])
   const [chatIdBox, setChatIdBox] = useState("");
   const [text, setText] = useState("");
 
-  // //socket
-  // const [socket, setSocket] = useState(null);
-  // const [onlineUsers, setOnlineUsers] = useState([]);
-
-  // console.log("onlineUsers", onlineUsers);
-  
-  // useEffect(() => {
-  //   const newSocket = io("http://localhost:3000");
-  //   setSocket(newSocket);
-
-  //   return () => {
-  //     newSocket.disconnect();
-  //   }
-  // },[userId])
-
-  // useEffect(() => {
-  //   if(socket === null) return
-  //   socket.emit("addNewUser", userId)
-  //   socket.on("getOnlineUsers", (res) => {
-  //     setOnlineUsers(res)
-  //   })
-  // }, [userId,socket])
+  console.log(chatBoxData);
 
   const findChat = async() => {
     const response = await axios.get(`http://localhost:4040/api/chats/${userId}`);
@@ -95,25 +76,34 @@ const Chat = () => {
   }
   
   const createMessageMutation = useMutation((newMessage) => 
-  axios.post('http://localhost:4040/api/messages', newMessage),{
-    mutationKey: 'createMessage',
-    onSuccess: () => {
-      // 새로운 메시지가 성공적으로 생성되면 해당 대화의 채팅 데이터를 다시 가져옴
-      const findChatBox = async () => {
-        const response = await axios.get(`http://localhost:4040/api/messages/${chatIdBox}`);
-        setChatBoxData(response.data);
-      };
-      findChatBox();
-    },
-    onError: (error) => {console.error('Error creating todo:', error);},
-    onSettled: () => {},
-  }
+    axios.post('http://localhost:4040/api/messages', newMessage),{
+      mutationKey: 'createMessage',
+      onSuccess: () => {
+        // 새로운 메시지가 성공적으로 생성되면 해당 대화의 채팅 데이터를 다시 가져옴
+        const findChatBox = async () => {
+          const response = await axios.get(`http://localhost:4040/api/messages/${chatIdBox}`);
+          setChatBoxData(response.data);
+        };
+        findChatBox();
+      },
+      onError: (error) => {console.error('Error creating todo:', error);},
+      onSettled: () => {},
+    }
   );
 
   const handleOnSubmit = () => {
     const data = {chatId: chatIdBox, senderId: userId, text: text}
+    socket.emit('send message', data)
     createMessageMutation.mutate(data);
   }
+
+  useEffect(() => {
+
+    socket.on('receive message', (message) => {
+      setChatBoxData(messageList => [...messageList, message]);
+    })
+    
+  }, []);
 
   if(isLodaing) return <p>Loding...</p>
 
