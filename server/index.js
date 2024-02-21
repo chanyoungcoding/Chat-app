@@ -33,13 +33,25 @@ const io = new Server(server, {
   },
 })
 
+let onlineUsers = [];
+
 io.on('connection', socket => {
   socket.on('send message', ({ chatId, senderId, text }) => {
     console.log(`${senderId} : ${text}`);
     io.emit('receive message', { chatId: chatId, senderId: senderId, text: text });
   });
-    socket.on('disconnect', function () {
+
+  socket.on('loginUser', ({user}) => {
+    if (!onlineUsers.some(item => item.user === user)) {
+      onlineUsers.push({user});
+      console.log(onlineUsers);
+      io.emit('receive user', onlineUsers);
+    }
+  })
+
+  socket.on('disconnect', () => {
 		console.log('user disconnected: ', socket.id);
+    console.log(onlineUsers)
 	});
 });
 

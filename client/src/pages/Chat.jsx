@@ -47,13 +47,14 @@ const ChatBox = styled.div`
 const Chat = () => {
   
   const userId = useRecoilValue(userData)[0]?._id
+  const userName = useRecoilValue(userData)[0]?.name
   const socket = socketIOClient('localhost:4040');
-  console.log(socket)
 
   const [chatBoxData, setChatBoxData] = useState([])
   const [chatIdBox, setChatIdBox] = useState("");
   const [text, setText] = useState("");
-
+  const [allUser, setAllUser] = useState([]);
+  console.log(allUser)
   console.log(chatBoxData);
 
   const findChat = async() => {
@@ -98,12 +99,17 @@ const Chat = () => {
   }
 
   useEffect(() => {
-
     socket.on('receive message', (message) => {
       setChatBoxData(messageList => [...messageList, message]);
     })
-    
   }, []);
+
+  useEffect(() => {
+    socket.emit('loginUser', {user: userName})
+    socket.on('receive user', (username) => {
+      setAllUser(username)
+    })
+  },[socket, userName])
 
   if(isLodaing) return <p>Loding...</p>
 
@@ -117,7 +123,7 @@ const Chat = () => {
 
           {data?.map((item,index) => (
             <div key={index}>
-              <UserChat member={item.members[1]} onClick={() => handleOnClick(item._id)}/>
+              <UserChat allUser={allUser} members={item.members} member={item.members[1]} onClick={() => handleOnClick(item._id)}/>
             </div>
           ))}
 

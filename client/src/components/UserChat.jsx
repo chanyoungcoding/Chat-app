@@ -4,6 +4,8 @@ import { useQuery } from 'react-query';
 import styled from "styled-components";
 
 import UserProfileImg from "../assets/profile.svg";
+import { useRecoilValue } from 'recoil';
+import { userData } from '../recoil/Auth';
 
 const UserChatBox = styled.div`
   width: 100%;
@@ -19,6 +21,7 @@ const UserChatBox = styled.div`
 
 const UserChatInformationBox = styled.div`
   flex-grow: 1;
+  position: relative;
   div {
     display: flex;
     justify-content: space-between;
@@ -43,10 +46,22 @@ const UserChatInformationBox = styled.div`
   cursor: pointer;
 `
 
-const UserChat = ({ member, onClick }) => {
+const UserLogin = styled.div`
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  right: 0;
+  top: -20px;
+  border-radius: 100%;
+  background-color: #1feac8;
+`
 
+const UserChat = ({ member, onClick,allUser,members }) => {
+  const userId = useRecoilValue(userData)[0]?._id
+  const username = members.filter(item => item !== userId)
+  console.log(member)
   const findOtherUser = async () => {
-    const response = await axios.get(`http://localhost:4040/api/users/find/${member}`);
+    const response = await axios.get(`http://localhost:4040/api/users/find/${username}`);
     return response.data;
   }
 
@@ -55,6 +70,9 @@ const UserChat = ({ member, onClick }) => {
     queryFn: findOtherUser
   })
 
+  const isUserInAllUsers = allUser.some(userObj => userObj.user === data?.name);
+
+  console.log(isUserInAllUsers)
   if (isLoading) return <p>Loading...</p>
   if (error) return <p>Something is wrong..</p>
 
@@ -64,6 +82,7 @@ const UserChat = ({ member, onClick }) => {
         <img src={UserProfileImg} alt="#" />
         <UserChatInformationBox >
           <div>
+            {isUserInAllUsers ? (<UserLogin></UserLogin>) : ""}
             <h1>{data?.name}</h1>
             <h2>12/12/2020</h2>
           </div>
@@ -80,6 +99,8 @@ const UserChat = ({ member, onClick }) => {
 UserChat.propTypes = {
   member: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
+  allUser: PropTypes.array.isRequired,
+  members : PropTypes.array.isRequired
 };
 
 export default UserChat;
