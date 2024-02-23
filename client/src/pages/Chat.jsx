@@ -1,7 +1,7 @@
 import axios from "axios"
 import { useMutation, useQuery } from "react-query"
 import { useRecoilValue } from "recoil"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import styled from "styled-components"
 import InputEmoji from "react-input-emoji";
 import socketIOClient from "socket.io-client";
@@ -28,6 +28,8 @@ const UserBox = styled.div`
 const ChatBox = styled.div`
   position: relative;
   width: 70%;
+  height: 700px;
+  overflow-y: scroll;
   padding: 30px;
   background-color: #1A1A1A;
   border-radius: 10px;
@@ -40,6 +42,10 @@ const ChatBox = styled.div`
   }
   .submitButton {
     cursor: pointer;
+  }
+  .inner {
+    height: 630px;
+    overflow-y: scroll;
   }
 `
 
@@ -54,8 +60,8 @@ const Chat = () => {
   const [chatIdBox, setChatIdBox] = useState("");
   const [text, setText] = useState("");
   const [allUser, setAllUser] = useState([]);
-  console.log(allUser)
-  console.log(chatBoxData);
+
+  const myDivRef = useRef();
 
   const findChat = async() => {
     const response = await axios.get(`http://localhost:4040/api/chats/${userId}`);
@@ -80,7 +86,6 @@ const Chat = () => {
     axios.post('http://localhost:4040/api/messages', newMessage),{
       mutationKey: 'createMessage',
       onSuccess: () => {
-        // 새로운 메시지가 성공적으로 생성되면 해당 대화의 채팅 데이터를 다시 가져옴
         const findChatBox = async () => {
           const response = await axios.get(`http://localhost:4040/api/messages/${chatIdBox}`);
           setChatBoxData(response.data);
@@ -96,7 +101,14 @@ const Chat = () => {
     const data = {chatId: chatIdBox, senderId: userId, text: text}
     socket.emit('send message', data)
     createMessageMutation.mutate(data);
+    setText('');
   }
+
+  useEffect(() => {
+    if (myDivRef.current) {
+      myDivRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatBoxData]); 
 
   useEffect(() => {
     socket.on('receive message', (message) => {
@@ -129,11 +141,14 @@ const Chat = () => {
 
         </UserBox>
         <ChatBox>
-        {chatBoxData ? chatBoxData?.map((item, index) => (
-          <div key={index}>
-            <ChattingBox text={item.text} createdAt={item.createdAt} senderId={item.senderId}/>
+          <div className="inner">
+          {chatBoxData ? chatBoxData?.map((item, index) => (
+            <div key={index}>
+              <ChattingBox text={item.text} createdAt={item.createdAt} senderId={item.senderId}/>
+            </div>
+          )) : ""}
+            <div ref={myDivRef}></div>
           </div>
-        )) : ""}
           <div className="chat_input">
             <InputEmoji
               value={text}

@@ -50,8 +50,8 @@ const UserLogin = styled.div`
   position: absolute;
   width: 15px;
   height: 15px;
-  right: 0;
-  top: -20px;
+  left: -20px;
+  top: 0px;
   border-radius: 100%;
   background-color: #1feac8;
 `
@@ -59,7 +59,7 @@ const UserLogin = styled.div`
 const UserChat = ({ member, onClick,allUser,members }) => {
   const userId = useRecoilValue(userData)[0]?._id
   const username = members.filter(item => item !== userId)
-  console.log(member)
+
   const findOtherUser = async () => {
     const response = await axios.get(`http://localhost:4040/api/users/find/${username}`);
     return response.data;
@@ -72,7 +72,6 @@ const UserChat = ({ member, onClick,allUser,members }) => {
 
   const isUserInAllUsers = allUser.some(userObj => userObj.user === data?.name);
 
-  console.log(isUserInAllUsers)
   if (isLoading) return <p>Loading...</p>
   if (error) return <p>Something is wrong..</p>
 
