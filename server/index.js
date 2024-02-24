@@ -35,10 +35,13 @@ const io = new Server(server, {
 
 let onlineUsers = [];
 
+let otherUserText = [];
+
 io.on('connection', socket => {
   socket.on('send message', ({ chatId, senderId, text }) => {
-    console.log(`${senderId} : ${text}`);
+    otherUserText.push({senderId, text}); //   [{ senderId: '65bdc6b7beef2ad895256bbf', text: '테스트해보자' },{...}],
     io.emit('receive message', { chatId: chatId, senderId: senderId, text: text });
+    io.emit('other user text', otherUserText)
   });
 
   socket.on('loginUser', ({user}) => {

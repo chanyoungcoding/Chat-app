@@ -41,7 +41,6 @@ const handleOnCreateMessage = () => {
 }
 
 const OtherUser = ({userId}) => {
-
   const OtherUser = async() => {
     const response = await axios.get(`http://localhost:4040/api/users`);
     return response.data;
@@ -90,5 +89,5 @@ const OtherUser = ({userId}) => {
 export default OtherUser
 
 OtherUser.propTypes = {
-  userId: PropTypes.string.isRequired
+  userId: PropTypes.string.isRequired,
 };

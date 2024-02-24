@@ -60,6 +60,7 @@ const Chat = () => {
   const [chatIdBox, setChatIdBox] = useState("");
   const [text, setText] = useState("");
   const [allUser, setAllUser] = useState([]);
+  const [otherUserText, setOtherUserText] = useState(null);
 
   const myDivRef = useRef();
 
@@ -114,6 +115,10 @@ const Chat = () => {
     socket.on('receive message', (message) => {
       setChatBoxData(messageList => [...messageList, message]);
     })
+    socket.on('other user text', (message) => {
+      console.log(message)
+      setOtherUserText(message)
+    })
   }, []);
 
   useEffect(() => {
@@ -135,7 +140,13 @@ const Chat = () => {
 
           {data?.map((item,index) => (
             <div key={index}>
-              <UserChat allUser={allUser} members={item.members} member={item.members[1]} onClick={() => handleOnClick(item._id)}/>
+              <UserChat 
+                allUser={allUser} 
+                members={item.members} 
+                member={item.members[1]} 
+                onClick={() => handleOnClick(item._id)}
+                otherUserText={otherUserText}
+              />
             </div>
           ))}
 
@@ -144,7 +155,11 @@ const Chat = () => {
           <div className="inner">
           {chatBoxData ? chatBoxData?.map((item, index) => (
             <div key={index}>
-              <ChattingBox text={item.text} createdAt={item.createdAt} senderId={item.senderId}/>
+              <ChattingBox 
+                text={item.text}
+                createdAt={item.createdAt} 
+                senderId={item.senderId}
+              />
             </div>
           )) : ""}
             <div ref={myDivRef}></div>

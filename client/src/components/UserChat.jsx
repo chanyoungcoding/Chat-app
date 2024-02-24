@@ -56,7 +56,8 @@ const UserLogin = styled.div`
   background-color: #1feac8;
 `
 
-const UserChat = ({ member, onClick,allUser,members }) => {
+const UserChat = ({ member, onClick, allUser, members, otherUserText}) => {
+  console.log(otherUserText) // [{senderId: '63d...', text: '해결해보자'}, {...}]
   const userId = useRecoilValue(userData)[0]?._id
   const username = members.filter(item => item !== userId)
 
@@ -71,6 +72,9 @@ const UserChat = ({ member, onClick,allUser,members }) => {
   })
 
   const isUserInAllUsers = allUser.some(userObj => userObj.user === data?.name);
+  console.log(data?._id); // 63d...
+  const test = otherUserText?.filter(item => item.senderId === data?._id);
+  console.log(`this is : ${test}`);
 
   if (isLoading) return <p>Loading...</p>
   if (error) return <p>Something is wrong..</p>
@@ -81,7 +85,7 @@ const UserChat = ({ member, onClick,allUser,members }) => {
         <img src={UserProfileImg} alt="#" />
         <UserChatInformationBox >
           <div>
-            {isUserInAllUsers ? (<UserLogin></UserLogin>) : ""}
+            {isUserInAllUsers ? (<UserLogin/>) : ""}
             <h1>{data?.name}</h1>
             <h2>12/12/2020</h2>
           </div>
@@ -99,7 +103,8 @@ UserChat.propTypes = {
   member: PropTypes.string.isRequired,
   onClick: PropTypes.func.isRequired,
   allUser: PropTypes.array.isRequired,
-  members : PropTypes.array.isRequired
+  members: PropTypes.array.isRequired,
+  otherUserText: PropTypes.array
 };
 
 export default UserChat;
